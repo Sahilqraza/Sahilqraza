@@ -1,0 +1,111 @@
+# Import pygame and random
+import pygame
+import random
+
+# Initialize pygame
+pygame.init()
+
+# Create a window
+window = pygame.display.set_mode((800, 600))
+
+# Create a clock
+clock = pygame.time.Clock()
+
+# Load images
+background = pygame.image.load("background.png")
+character = pygame.image.load("character.png")
+obstacle = pygame.image.load("obstacle.png")
+item = pygame.image.load("item.png")
+
+# Resize images
+background = pygame.transform.scale(background, (800, 600))
+character = pygame.transform.scale(character, (100, 100))
+obstacle = pygame.transform.scale(obstacle, (100, 100))
+item = pygame.transform.scale(item, (50, 50))
+
+# Load sound
+sound = pygame.mixer.Sound("sound.wav")
+
+# Create variables and constants
+character_x = 100  # The x-coordinate of the character
+character_y = 400  # The y-coordinate of the character
+character_speed = 10  # The speed of the character
+character_jump = False  # The jump state of the character
+character_jump_height = 200  # The maximum height of the character's jump
+obstacle_x = 800  # The x-coordinate of the obstacle
+obstacle_y = 450  # The y-coordinate of the obstacle
+obstacle_speed = 5  # The speed of the obstacle
+item_x = 800  # The x-coordinate of the item
+item_y = 300  # The y-coordinate of the item
+item_speed = 5  # The speed of the item
+score = 0  # The score of the player
+font = pygame.font.SysFont("Arial", 32)  # The font for displaying the score
+power_up_timer = 0  # Timer for the flying power-up
+power_up_duration = 5 * 60  # 5 seconds * 60 frames per second
+
+# Create a main loop
+running = True  # A flag for running the game
+while running:
+    # Handle events
+    for event in pygame.event.get():
+        # Check if the user has closed the window
+        if event.type == pygame.QUIT:
+            # Exit the game
+            running = False
+
+        # Check if the user has pressed a key
+        if event.type == pygame.KEYDOWN:
+            # Check if the user has pressed the space bar
+            if event.key == pygame.K_SPACE:
+                # Make the character jump if it is not already jumping and not under the effects of a power-up
+                if not character_jump and power_up_timer <= 0:
+                    character_jump = True
+
+            # Check if the user has pressed the "Q" key to quit
+            if event.key == pygame.K_q:
+                running = False
+
+    # Update the power-up timer
+    if power_up_timer > 0:
+        power_up_timer -= 1
+    else:
+        # Power-up has expired, reset the character's jump ability
+        character_jump = False
+
+    # Update the state of the game objects
+    # Move the character up or down based on its jump state
+    if character_jump:
+        character_y -= character_speed
+        # Check if the character has reached its maximum height
+        if character_y <= character_jump_height:
+            character_jump = False
+    else:
+        character_y += character_speed
+        # Check if the character has reached the ground level
+        if character_y >= 400:
+            character_y = 400
+
+    # Move the obstacle to the left based on its speed
+    obstacle_x -= obstacle_speed
+
+    # Check if the obstacle has gone out of the window
+    if obstacle_x <= -100:
+        # Reset the obstacle to the right edge of the window with a random speed and height
+        obstacle_x = 800
+        obstacle_speed = random.randint(5, 10)
+        obstacle_y = random.randint(350, 450)
+
+    # Move the item to the left based on its speed
+    item_x -= item_speed
+
+    # Check if the item has gone out of the window
+    if item_x <= -50:
+        # Reset the item to the right edge of the window with a random speed and height
+        item_x = 800
+        item_speed = random.randint(5, 10)
+        item_y = random.randint(250, 350)
+
+    # Check for collisions between the character and the obstacle or the item using their rectangular areas
+    character_rect = pygame.Rect(character_x, character_y, 100, 100)
+    obstacle_rect = pygame.Rect(obstacle_x, obstacle_y, 100, 100)
+    item_rect = pygame.Rect(item_x, item_y, 50, 50
